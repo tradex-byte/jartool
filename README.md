@@ -4,20 +4,25 @@ Command-line tool for decompiling, text replacement, and compiling JAR files.
 
 ## Compilation
 
+### Windows
 go build -o jartool.exe jartool.go
 
+### Linux
 set GOOS=linux
 set GOARCH=amd64
 go build -o jartool-linux jartool.go
 
+### macOS
 set GOOS=darwin
 set GOARCH=amd64
 go build -o jartool-macos jartool.go
 
+### FreeBSD
 set GOOS=freebsd
 set GOARCH=amd64
 go build -o jartool-freebsd jartool.go
 
+### Reset environment variables (Windows)
 set GOOS=
 set GOARCH=
 
@@ -60,7 +65,7 @@ jartool -c decompiled -o app_modified.jar
 
 Automatic Java download if not present
 Java stored in java directory next to executable
-Cross-platform (Windows and Linux)
+Cross-platform (Windows, Linux, macOS, FreeBSD)
 No administrator privileges required
 Works on older operating systems
 Single binary file
@@ -80,7 +85,7 @@ java/
 ## Requirements
 
 Go 1.10 or higher (for compilation only)
-Operating System: Windows or Linux
+Operating System: Windows, Linux, macOS, or FreeBSD
 Internet connection (for automatic Java download)
 No external dependencies for the compiled binary
 
