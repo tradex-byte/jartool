@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 )
 
 type ConsoleLogger struct{}
@@ -324,16 +323,33 @@ func executeTextReplacement(directoryPath, searchText, replaceText string, logge
 
 		totalFilesScanned++
 
-		fileContent, errorRead := os.ReadFile(filePath)
+		fileContent, errorRead := os.Open(filePath)
 		if errorRead != nil {
 			logger.writeWarning("Failed to read %s: %v", filepath.Base(filePath), errorRead)
 			return nil
 		}
+		defer fileContent.Close()
 
-		contentString := string(fileContent)
+		contentBytes := make([]byte, 0)
+		buffer := make([]byte, 1024)
+		for {
+			n, err := fileContent.Read(buffer)
+			if n > 0 {
+				contentBytes = append(contentBytes, buffer[:n]...)
+			}
+			if err != nil {
+				break
+			}
+		}
+
+		contentString := string(contentBytes)
 		if strings.Contains(contentString, searchText) {
-			updatedContent := strings.ReplaceAll(contentString, searchText, replaceText)
-			os.WriteFile(filePath, []byte(updatedContent), 0)
+			updatedContent := strings.Replace(contentString, searchText, replaceText, -1)
+			fileContent.Close()
+			os.Remove(filePath)
+			file, _ := os.Create(filePath)
+			file.Write([]byte(updatedContent))
+			file.Close()
 			filesModified++
 			logger.writeInfo("Modified: %s", filepath.Base(filePath))
 		}
@@ -372,7 +388,9 @@ func executeCompilation(sourceDirectory, outputJar, jarCommand string, logger *C
 	} else {
 		logger.writeInfo("Creating default MANIFEST.MF")
 		temporaryManifest := absoluteSourcePath + "/MANIFEST.MF"
-		os.WriteFile(temporaryManifest, []byte("Manifest-Version: 1.0\n"), 0)
+		file, _ := os.Create(temporaryManifest)
+		file.Write([]byte("Manifest-Version: 1.0\n"))
+		file.Close()
 		defer os.Remove(temporaryManifest)
 		compileCommand = exec.Command(jarCommand, "cfm", absoluteOutputPath, temporaryManifest, "-C", absoluteSourcePath, ".")
 	}
