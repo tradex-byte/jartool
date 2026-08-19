@@ -5,7 +5,7 @@ Command-line tool for decompiling, text replacement, and compiling JAR files.
 ## Compilation
 
 ### Windows
-set GOOS=windows && set GOARCH=amd64 && go build -ldflags="-s -w" -o jartool.exe jartool.go
+go build -o jartool.exe jartool.go
 
 ### Linux
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o jartool jartool.go
