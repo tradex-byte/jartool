@@ -16,6 +16,9 @@ set GOOS=freebsd
 set GOARCH=amd64
 go build -o jartool-freebsd jartool.go
 
+set GOOS=
+set GOARCH=
+
 ## Usage
 
 Decompile JAR file:
